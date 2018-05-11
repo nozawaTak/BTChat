@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickSoundButton(View v) {
         Log.d(TAG, "onClickSoundButton");
         if (commThread != null) {
-            String content = "xxx";
+            String content = "Accept SoundPlay!";
             if (content.length() == 0) {
                 Toast.makeText(this, R.string.toast_empty_message, Toast.LENGTH_SHORT).show();
                 return;
@@ -718,7 +718,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showMessage(ChatMessage message) {
-        if (message.content.equals("xxx")) {
+        if (message.content.equals("Accept SoundPlay!")) {
             soundPool.play(sound_downButton, 1.0f, 1.0f, 0, 0, 1);
         }
         chatLogAdapter.add(message);
