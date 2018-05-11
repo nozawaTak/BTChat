@@ -7,6 +7,7 @@
     <string name="conn_status_text_waiting_for_connection">Listening for incoming connection</string>
 
     <string name="send_button_label">Send</string>
+    <string name="sound_button_label">Sound</string>
     <string name="input_text_hint">Message</string>
 
     <string name="menu_connect_title">Connect</string>

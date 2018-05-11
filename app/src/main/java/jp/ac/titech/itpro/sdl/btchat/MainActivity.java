@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView chatLogView;
     private EditText inputText;
     private Button sendButton;
+    private Button soundButton;
 
     private ArrayList<ChatMessage> chatLog;
     private ArrayAdapter<ChatMessage> chatLogAdapter;
@@ -70,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
         Disconnected,
         Connecting,
         Connected,
-        Waiting
+        Waiting,
+        Sounding
     }
 
     private State state = State.Initializing;
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     private SoundPool soundPool;
     private int sound_connected;
     private int sound_disconnected;
+    private int sound_downButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         connectionProgress = findViewById(R.id.connection_progress);
         inputText = findViewById(R.id.input_text);
         sendButton = findViewById(R.id.send_button);
+        soundButton = findViewById(R.id.sound_button);
         chatLogView = findViewById(R.id.chat_log_view);
         chatLogAdapter = new ArrayAdapter<ChatMessage>(this, 0, chatLog) {
             @Override
@@ -152,6 +156,8 @@ public class MainActivity extends AppCompatActivity {
         sound_connected = soundPool.load(this, R.raw.nhk_doorbell, 1);
         // https://www.nhk.or.jp/archives/creative/material/view.html?m=D0002070102_00000
         sound_disconnected = soundPool.load(this, R.raw.nhk_woodblock2, 1);
+        // https://www.titech.ac.jp/about/overview/logo/file/s_logo_a.mp3
+        sound_downButton = soundPool.load(this, R.raw.s_logo_a, 1);
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter != null)
@@ -292,6 +298,26 @@ public class MainActivity extends AppCompatActivity {
             inputText.getEditableText().clear();
         }
     }
+
+    public void onClickSoundButton(View v) {
+        Log.d(TAG, "onClickSoundButton");
+        if (commThread != null) {
+            String content = "xxx";
+            if (content.length() == 0) {
+                Toast.makeText(this, R.string.toast_empty_message, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            message_seq++;
+            long time = System.currentTimeMillis();
+            ChatMessage message = new ChatMessage(message_seq, time, content, devName);
+            commThread.send(message);
+            chatLogAdapter.add(message);
+            chatLogAdapter.notifyDataSetChanged();
+            chatLogView.smoothScrollToPosition(chatLog.size());
+            inputText.getEditableText().clear();
+        }
+    }
+
 
     private void setupBT() {
         Log.d(TAG, "setupBT");
@@ -686,11 +712,15 @@ public class MainActivity extends AppCompatActivity {
             inputText.setEnabled(false);
             sendButton.setEnabled(false);
             break;
+
         }
         invalidateOptionsMenu();
     }
 
     private void showMessage(ChatMessage message) {
+        if (message.content.equals("xxx")) {
+            soundPool.play(sound_downButton, 1.0f, 1.0f, 0, 0, 1);
+        }
         chatLogAdapter.add(message);
         chatLogAdapter.notifyDataSetChanged();
         chatLogView.smoothScrollToPosition(chatLogAdapter.getCount());
